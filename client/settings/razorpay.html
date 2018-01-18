@@ -1,0 +1,64 @@
+<template name="razorpaySettings">
+    {{#unless packageData.settings.api_key}}
+    <div class="alert alert-info">
+      <span data-i18n="admin.paymentSettings.razorpaySettingsDescription">Don't have a Razor Pay API Client ID?</span>
+      <a href="https://dashboard.razorpay.com/#/app/dashboard" target="_blank">
+        <span data-i18n="admin.paymentSettings.razorpaySettingsGetItHere">Get it here.</span>
+      </a>
+    </div>
+    {{/unless}}
+    <div>
+      {{#autoForm collection=Collections.Packages schema=RazorpayPackageConfig doc=packageData type="update" id="razorpay-update-form"}}
+        {{>afQuickField name='settings.api_key'}}
+	{{>afQuickField name='settings.api_secret'}}
+        {{>afQuickField name="settings.reaction-razorpay.support" options="allowed" noselect=true}}
+        <button type="submit" class="btn btn-primary pull-right"><span data-i18n="app.saveChanges">Save Changes</span></button>
+      {{/autoForm}}
+    </div>
+
+</template>
+
+
+
+<template name="razorpay">
+  <div class="container-fluid-sm flex">
+    <div class="flex-item">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">Razorpay Checkout</div>
+        </div>
+        <div class="list-group">
+          <div class="list-group-item">
+            {{#if packageData.settings.api_key}}
+              <span>API Client ID: <button type="button" class="btn btn-link" data-event-action="showRazorpaySettings">**********</button></span>
+            {{else}}
+              <span>API Client ID: <button type="button" class="btn btn-link" data-event-action="showRazorpaySettings">Configure Now</button></span>
+            {{/if}}
+          </div>
+        </div>
+        <div class="panel-footer">
+          <div class="left"></div>
+          <div class="right">
+
+            <div class="panel-footer-item">
+              {{#if packageData.settings.api_key}}
+                <i class="fa fa-check-circle fa-2x text-success"></i>
+              {{else}}
+                <i class="fa fa-minus-circle fa-2x text-muted"></i>
+              {{/if}}
+            </div>
+
+            <div class="panel-footer-item">
+              <button class="btn btn-default" data-event-action="showRazorpaySettings">
+                <i class="fa fa-gear"></i>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+

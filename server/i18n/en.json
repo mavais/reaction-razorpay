@@ -1,0 +1,24 @@
+[{
+  "language": "English",
+  "i18n": "en",
+  "ns": "reaction-razorpay",
+  "translation": {
+    "reaction-payments": {
+      "admin": {
+        "shortcut": {
+          "razorpayLabel": "Razorpay"
+        },
+        "dashboard": {
+          "razorpayLabel": "Razorpay",
+          "razorpayDescription": "Razorpay payments"
+        },
+        "paymentSettings": {
+          "razorpayLabel": "Razorpay",
+          "razorpaySettingsLabel": "Razorpay",
+          "razorpaySettingsDescription": "Don't have a Razorpay API Client ID?",
+          "razorpaySettingsGetItHere": "Get it here"
+        }
+      }
+    }
+  }
+}]
