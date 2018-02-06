@@ -110,6 +110,21 @@ function razorpayCaptureCharge(authorizationId, amount) {
 
 Meteor.methods({
   /**
+   * Return the settings for the Razorpay payment Method
+   * @return {Object} Express Checkout settings
+   */
+  "getRazorpayCheckoutSettings": function () {
+  const settings = Packages.findOne({
+    name: "reaction-razorpay",
+    shopId: Reaction.getShopId()
+  }).settings;
+  if (!settings.api_key) {
+    throw new Meteor.Error("403", "Invalid Razorpay Credentials");
+  }
+  return settings.api_key;
+  },
+
+  /**
    * Capture a Razorpay charge
    * @see https://docs.razorpay.com/docs/v1paymentsidcapture
    * @param  {Object} paymentMethod A PaymentMethod object
@@ -122,7 +137,7 @@ Meteor.methods({
     const amount = formatForRazorpay(paymentData.amount);
     captureResult = razorpayCaptureCharge(authorizationId, amount);
 
-    return captureResult
+    return captureResult;
   },
 
   /**

@@ -9,8 +9,10 @@ import { $ } from "meteor/jquery";
 import { getCardType } from "/client/modules/core/helpers/globals";
 import { Reaction } from "/client/api";
 import { Cart, Shops, Packages } from "/lib/collections";
-//import { RazorpayCapture } from "../../lib/api";
 import { RazorpayPayment } from "../../lib/collections/schemas";
+//
+import _ from "lodash";
+import { ReactiveVar } from "meteor/reactive-var";
 
 import "./razorpay.html";
 
@@ -83,18 +85,6 @@ function formatForRazorpay(amount) {
   return Math.round(amount * 100);
 }
 
-function getApiKey() {
-  const settings = Packages.findOne({
-    name: "reaction-razorpay",
-    shopId: Reaction.getShopId()
-  }).settings;
-  if (!settings.api_key) {
-    const message = "Invalid Razorpay Credentials";
-    return paymentAlert(message);
-  }
-  return settings.api_key;
-}
-
 const chargeObjectSchema = new SimpleSchema({
   amount: { type: Number },
   shopName: { type: String }
@@ -104,11 +94,28 @@ const chargeObjectSchema = new SimpleSchema({
 // Template helpers
 //
 
+
 Template.razorpayPaymentForm.helpers({
   RazorpayPayment() {
   $('body').append('<script type="text/javascript" src="https://checkout.razorpay.com/v1/checkout.js">');
     return RazorpayPayment;
   }
+});
+
+
+Template.razorpayPaymentForm.onCreated(function () {
+//  const template = this.template;
+  Meteor.call("getRazorpayCheckoutSettings", function (error, RazorpayApiKey) {
+    if (error) {
+//        template.$("#rzp-button").attr("disabled", true);
+        document.getElementById("rzp-button").setAttribute("disabled", true);
+        const message = "Razorpay not setup! If you see this, please write back to us and we'll get it fixed.";
+        return paymentAlert(message);
+    }
+   else {
+      return Session.set("RazorpayApiKey", RazorpayApiKey);
+    }
+  });
 });
 
 //
@@ -118,21 +125,27 @@ Template.razorpayPaymentForm.helpers({
 Template.razorpayPaymentForm.events({     
        'click #rzp-button': function(e){
     const template = this.template;
-    const apiKey = getApiKey();
+    const RazorpayApiKey = Session.get("RazorpayApiKey");
     const total = Cart.findOne().cartTotal();
     const amount = formatForRazorpay(total);
     const name = Shops.findOne().name;
     var options = {
-       "key" : apiKey,
+       "key" : RazorpayApiKey,
        "amount" : amount,
        "name" : name,
        "handler" : function(response){ handleRazorpayPayment(response, amount, template);}    
       };
-
-    var instance = new Razorpay(options);
-          instance.open();
-          e.preventDefault();
+    if (RazorpayApiKey) {
+      try {
+       var instance = new Razorpay(options);
+       instance.open();
+       e.preventDefault(); 
        }
+      catch (error) {
+       Logger.warn(error);
+       }
+     }
+   }
 });
 
 //
